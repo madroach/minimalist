@@ -1,0 +1,314 @@
+Minimalist 2.5(3)		(Jun 17, 2005)
+
+ . Fixed few annoying errors in parsing headers
+ . Changed way of determination domain name (to 'uname -n')
+ . Added new directives 'modify message-id'
+ . Added new directives 'blocked robots' and 'cc on subscribe' by Volker Tanger,
+    big thanks to him :-) Check minimalist.conf-sample for details
+ . Added Ukrainian (UA) and French (FR) language at http://www.mml.org.ua/languages/
+ . Added 'List-ID' header as per RFC2919
+ . Some code cleanups
+
+Minimalist 2.5(2.3)		(Jul 13, 2004)
+
+ . Command 'who' returns result, sorted in domain order, not in order of
+    subscription
+ . Fixed few small errors in parsing headers
+
+Minimalist 2.5(2)		(May 21, 2004)
+
+ . Added support for bounce processing (using VERP). Directive 'errors to' has
+    expanded to value 'verp'.
+ . Added directive 'to recipient'.
+
+ See minimalist.conf-sample for detailed explanation on these directives.
+
+Minimalist 2.5(1.5)		(Interim)
+
+ . Fixed error in parsing command line arguments
+ . Fixed error in parsing list of subscribers
+ . Fixed error in working with pre-configured GECOS
+
+Minimalist 2.5(1.4)		(Mar 24, 2004)
+
+ . Password must be supplied in any header of message as fragment of header in
+    the following format: {pwd: list_password}. See README for further
+    details
+ . Minimialist now doesn't produce MIME message, if there isn't footer for the
+    list
+ . Fixed stupid typo: header X-Been-There changed for X-BeenThere for
+    compatibility with Mailman
+
+Minimalist 2.5(1.2)		(Mar 03, 2004)
+
+ . Fixed bug, which leads to truncate some incoming message
+ . Fixed broken loop handling
+
+Minimalist 2.5(1)		(Feb 21, 2004)
+
+ There are many functional changes, author recommends all to read file README
+ before using Minimalist. Yes, it is mostly back compatible, but not always.
+
+ . New commands: mode, suspend, resume, maxsize.
+ . Batched processing (one or more commands in body of message).
+ . Work around MIME-encoded messages when adding footer to outgoing message.
+ 
+ . Added directive 'log messages' - log information about messages (From,
+    size, Subject, etc).
+ . Added directive 'archive size' - it sets maximum size of message, which
+    will be archived.
+ . Added directive 'charset' - it defines charset, used in information
+    messages (from Minimalist itself) and footer. See README in part III.3.b,
+    where dances around footer are explained.
+
+Minimalist 2.4			(Jule 14, 2003)
+
+ . Added directive 'background', which allows to detach Minimalist from MTA
+    and run in background.
+ . Added command-line option "-c", which specifies configuration file for
+    Minimalist.
+ . Minimalist now preserves original To: and Cc: headers, but
+    unconditionally removes original Reply-To: header.
+ . Directive 'maxrcpts' now has bounds: from 1 to 50.
+ 
+Minimalist 2.3(3.3)		(June 29, 2003)
+
+ . Fixed security hole, which allows to execute some commands on host where
+    Minimalist works.
+ . Added directive 'list gecos'.
+ . Fixed bug, when single '.' in message treated as end of message.
+ 
+Minimalist 2.3(3)		(June 5, 2003)
+
+ . Added directive 'remove resent', see minimalist.conf-sample for more
+    information.
+ . Expanded directive errors_to - it is possible to use there arbitrary
+    E-mail, not only 'drop', 'admin' and 'sender'.
+ . Added report of count of subscribers, when requesting subscribers list.
+ . Fixed few bugs
+
+Minimalist 2.3(1)		(???)
+ 
+ . Code reworked to support internationalization. This is done by Volker
+    Tanger, thanks to him for this great work.
+ . New directive 'extra header'. Can be used for add extra headers to
+    message. See description in minimalist.conf-sample
+ . Changed sorting criteria of recipients list. Now Minimalist sorts it by
+    domains, which will speed up sending of message.
+
+Minimalist 2.2(4.3)
+
+ . Fixed bug, which appears when processing unsubscribe requests on full
+    filesystem. In such case Minimalist was drop subscription list. Thanks
+    to Lars J. Aas for pointing to this problem.
+ 
+Minimalist 2.2(4.2)		(May 7, 2002)
+
+ . Added stripping of various "Return Request" headers. Currently there
+    are: Return-Receipt-To, Disposition-Notification-To,
+    X-Confirm-Reading-To.
+ . Enhanced directive "blacklist" - it is more reliable now. See
+    minimalist.conf-sample for further explanation.
+ . Added directory contrib/ where useful supporting software can be found.
+
+Minimalist 2.2(4)		(February 9, 2002)
+
+ . Added support for RFC 2369 headers in outgoing message (information
+    about subscription/unsubscription/etc).
+ . Fixed small uncritical bug in handling GECOS pattern.
+ . Added directory docs/FAQ/ - there are most often questions and answers.
+
+Minimalist 2.2(3)		(September 20, 2001)
+
+ . If sender uses GECOS in listname - for example:
+
+    To: My Cool List <listname@some.domain>
+
+    then Minimalist saves it and fills 'To:' header in outgoing message
+    with this value. Whistle, of course, but so pretty :)
+
+Minimalist 2.2(2)		(March 5, 2001)
+
+ . Added directive 'delay'. It defines pause between calls to sendmail and
+    with 'maxrcpts' can be used for slow down process of generating
+    messages.
+ . Added directive 'from' - it is possible to set 'From:' header of
+    outgoing mail to some predefined value.
+
+Minimalist 2.2			(October 25, 2000)
+
+ . Added support for external delivery of processed message. Check new
+    directive 'delivery' in minimalist.conf-sample. Useful when using bulk
+    mailers (for example ftp://cs.utk.edu/pub/moore/bulk_mailer/)
+ . Added support for write-only subscribe. If user sends request with
+    suffix '-writers' in list name, he will be able to send messages to
+    list, but will receive nothing from list.
+
+Minimalist 2.1(2)		(October 3, 2000)
+
+ . Fixed security hole, which affects all versions of Minimalist - if
+    spammer uses "|" at the end of From: header, he can write to list even
+    if this list closed or he doesn't subscribed to it.
+ . Fixed typo in code, which support authentication for subscribe and
+    unsubscribe requests.
+ . Added functionality to "domain" directive - it is possible to call
+    external program (for determine domain name) by prepending "|" before
+    program name.
+ . Changed default admin's email - it is now postmaster@primary_domain (was
+    root@primary_domain)
+ . Removed "-w" key from Perl's command line.
+
+Minimalist 2.1 (Patience)	(September 22, 2000)
+
+ Changes from RC are minimal:
+
+  . Added '-d <path_to_conf>' directive, which points to directory, where
+     is main configuration file (minimalist.conf) located.
+  . If domain doesn't contain a dot, Minimalist tries to use "domainname"
+     command to add domain to hostname. It is useful for SunOS system.
+  . Added "Precedence: list" header to message. It used by vacation and
+     similar programs for identify mails from robots.
+  . Added check for SysV-style "From " header in message. It is used (among
+     with other methods) for preventing robot wars.
+
+Minimalist 2.1RC (Barcelona)	(***************)
+ 
+ There are couple of changes, which users should note:
+
+ . License has changed from GPL to BSD. This license is more free for
+    developers and the same, as GPL, for end users.
+ . Directive 'auth valid' has changed to 'request valid'.
+ . Directive 'trusted' removed - see description for new directive 'auth'
+    below.
+ . Logfile's format has changed.
+ . Prior to version 2.0.2 Minimalist didn't adding header 'Sender:' if
+    there wasn't this header in original message. In 2.0.2 this was changed
+    to add it (see last item in the announce for 2.0.2 below) and now this
+    feature completely removed as quite unuseful.
+ . Administrator can write to the list even if he isn't member of the list.
+ . Directive 'list' (it was aliased to 'who') removed.
+
+ There are changes to authentication scheme for administrative requests. As
+ said above, directive 'trusted' removed. New scheme is: there is global
+ administrative password - it gives ability to make administrative requests
+ and changes to all lists, hosted on particular server (directive
+ 'password' in global configuration file). For lists there is new directive
+ 'auth' - see minimalist.conf-sample for syntax.
+
+ 
+Minimalist 2.0.2 (Banana) (November 6, 1999)
+
+ . Added directive 'maxsize'. It limits maximum message size, including
+    headers.
+ . Added directive 'errors to'. All error messages from MTA can be dropped
+    (default behaviour) or can be sent to administrator or sender of
+    original message. See minimalist.conf-sample for further details.
+ . Added some paranoid checks for revealing administrator's errors.
+ . Slightly changed behaviour, when replying with authentication request:
+    command 'auth' now appears in a subject of message, so user can just do
+    Reply, without ugly cut-n-paste from body to subject.
+ . If there isn't 'Sender' header in original message, Minimalist creates
+    it in the final message and fills it with value from 'From' header.
+
+Minimalist 2.0.1 (Black Sea) (August 22, 1999)
+
+ . Fixed stupid error, which could cause incorrect message
+    creation. Thanks to Jerome Mouton for pointing to this
+    problem.
+
+Minimalist 2.0 (Eclipse) (August 11, 1999)
+
+ . Added code for authentication subscribe/unsubscribe requests.
+ . Added support for blacklists
+ . Added activity logging
+ . Added locking files before writing (thanks to Carlo Strozzi for
+    pointing to this problem)
+ . Many of minor corrections/additions/code cleanups.
+
+Minimalist 1.3.5-pl3 (June 29, 1999)
+
+ . Fixed bug in headers handling. Thanks to Craig Lamparter for
+   reporting it.
+
+Minimalist 1.3.5-pl2 (June 7, 1999)
+
+ . Fixed bug in headers handling. It appears in all versions of
+    Minimalist.
+ . Backported from 2.0-devel new command 'which' - get
+    subscription list for specified user. See README for details.
+
+Minimalist 1.3.5-pl1 (June 6, 1999)
+
+ . Fixed error in handling archiving strategy
+ . Fixed typo in minimalist.conf-sample
+ . Some code cleanups
+
+Minimalist 1.3.5 (May 29, 1999)
+
+ This release made by Carlo Strozzi, big thanks for this great job.
+
+ . Added archiving to pipe to external program (by C.Strozzi)
+ . Improved code readability (by C.Strozzi)
+ . English corrections (by C.Strozzi)
+
+Minimalist 1.3.4 (April 30, 1999; tiny fixes May 4)
+
+ . Minimalist now sends a couple of small mails instead of one big.
+    Directive 'maxrcpts' controls this behaviour.
+ . Trusted user's password don't save in archive.
+ . Documentation changes
+ . Some code cleanups
+
+Minimalist 1.3.3 (March 17, 1999)
+
+ . Subscribers don't want to receive rejects from remote mailers due
+    to miscellaneous delivery failures, do it? They now will not
+    receive rejects.
+ . Changed behaviour of 'modify subject' directive. It is less aggressive
+    by default. Value 'more' makes modification more deep. See
+    minimalist.conf-sample for details.
+
+Minimalist 1.3.2 (March 16, 1999)
+
+ This is maintenance release, without new features, bug-fixes only. Big
+ thanks to internet community for lots of suggestions and extensive beta
+ testing.
+
+ . Fixed bug in handling headers, which was appear under rare
+    circumstances.
+ . Fixed bug in handling macroses \a, \o, \d, \l. Thanks to Steven Filling
+    for reporting this problem.
+ . Some non-critical errors fixes.
+ . Added short manual 'Virtual domains and Minimalist 1.3'
+
+Minimalist 1.3 (March 12, 1999)
+
+ . Fixed bug in handling multiline headers. Thanks to Michael Rohleder for
+    reporting it.
+ . Improved security: trusted users must now supply password for privileged
+    commands.
+ . Improved support for virtual hosts:
+   * all directives except 'directory' and 'admin' now may be used in
+     private list's configs
+   * directive 'reply-to list' now may contain full e-mail address
+ . Added functionality to directive 'status' - status now can be mixed. See
+    minimalist.conf-sample for details.
+ . Added directive 'maxusers' for limiting subscribers per list.
+ . Documentation changes
+
+Minimalist 1.2 (March 02, 1999)
+
+ . Added two new directives:
+   * 'reply-to list'
+   * 'modify subject'
+ . Documentation changes
+
+Minimalist 1.1 (January 28, 1999)
+
+ . Added new directive 'copy to sender'
+ . Some optimization
+ . Some code cleanups
+
+Minimalist 1.0
+
+ . First public release
