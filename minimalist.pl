@@ -2,6 +2,7 @@
 #
 # Minimalist - Minimalistic Mailing List Manager.
 # Copyright (c) 1999-2005 Vladimir Litovka <vlitovka@gmail.com>
+# Copyright (c) 2012 Christopher Zimmermann <madroach@gmerlin.de>
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
