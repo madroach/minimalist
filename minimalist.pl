@@ -328,7 +328,6 @@ if (defined $ARGV[0] && $ARGV[0] eq '-') {
     
     # Various checks
     $msg .= " * $lconf{directory} doesn't exist!\n" if (! -d $lconf{directory});
-    $msg .= " * $lconf{sendmail} doesn't exist!\n" if (! -x $lconf{sendmail});
     $msg .= " * Invalid 'log messages' value '$lconf{logmessages}'\n" if ($lconf{logmessages} !~ /^yes$|^no$/i);
     $msg .= " * Invalid 'background' value '$lconf{background}'\n" if ($lconf{background} !~ /^yes$|^no$/i);
     $msg .= " * Invalid domain '$lconf{domain}'\n" if ($lconf{domain} !~ /^(\w[-\w]*\.)+[a-z]{2,4}$/i);
