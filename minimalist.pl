@@ -598,53 +598,50 @@ _EOF_
 
     # If sender isn't admin and not in list of allowed writers
     if (($conf{security} ne 'none') && ! verify($from, $password) && !grep(/^$qfrom$/i, @rw)) {
-      $msg =
-      "To: $mailto\n".
-      "Subject: $subject\n\n".
+      my $body =
+	mt('ERROR:'). "\n\t".
+	mt('You([_1]) are not subscribed to this list([_2]).', $from, $list).
+	"\n\n".
+	mt('SOLUTION:'). "\n\t".
+	mt("Send a message to [_1] with a subject of 'help' (no quotes) for information about howto subscribe.",
+	  "$conf{me}").
+	"\n\n".
+	mt('Your message follows:').
+	'==========================================================================='.
+	$body.
+	'===========================================================================';
 
-      mt('ERROR:'). "\n\t".
-      mt('You([_1]) are not subscribed to this list([_2]).', $from, $list).
-      "\n\n".
-      mt('SOLUTION:'). "\n\t".
-      mt("Send a message to [_1] with a subject of 'help' (no quotes) for information about howto subscribe.",
-	"$conf{me}").
-      "\n\n".
-      mt('Your message follows:').
-      '==========================================================================='.
-      $body.
-      '===========================================================================';
+      send_message("Subject: $subject", $body, $mailto)
     } 
 
   # If list or sender in read-only mode and sender isn't admin and not
   # in allowed writers
   elsif (($conf{status} & $RO || grep(/^$qfrom$/i, @readonly)) && !verify($from, $password) && !grep(/^$qfrom$/i, @writeany)) {
-    $msg =
-      "To: $mailto\n".
-      "Subject: $subject\n\n".
-
+    my $body =
       mt('ERROR:'). "\n\t".
       mt('You([_1]) are not allowed to write to this list.', $from). "\n\n".
       mt('Your message follows:').
       '==========================================================================='.
       $body.
       '===========================================================================';
+
+    send_message("Subject: $subject", $body, $mailto)
   }
   elsif ($conf{maxsize} && (length($header) + length($body) > $conf{maxsize})) {
-    $msg =
-    "To: $mailto\n".
-    "Subject: $subject\n\n".
+    my $body =
+      mt('ERROR:'). "\n\t".
+      mt('Message size is larger than maximum allowed ([_1] bytes).',
+	$conf{maxsize}).
+      "\n\n".
+      mt('SOLUTION:'). "\n\t".
+      mt('Either send a smaller message or split your message into multiple smaller ones.').
+      "\n\n".
+      mt('Your message header follows:').
+      '==========================================================================='.
+      $header.
+      '===========================================================================';
 
-    mt('ERROR:'). "\n\t".
-    mt('Message size is larger than maximum allowed ([_1] bytes).',
-      $conf{maxsize}).
-    "\n\n".
-    mt('SOLUTION:'). "\n\t".
-    mt('Either send a smaller message or split your message into multiple smaller ones.').
-    "\n\n".
-    mt('Your message header follows:').
-    '==========================================================================='.
-    $header.
-    '===========================================================================';
+    send_message("Subject: $subject", $body, $mailto)
   }
   else {		# Ok, all checks done.
     logCommand($from, "L=\"$list\" T=\"$orig_subj\" S=".(length($header) + length($body))) if ($conf{logmessages} ne 'no' && $conf{logfile} ne 'none');
