@@ -45,7 +45,7 @@ require POSIX;
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
 $ENV{'PATH'} = '/bin:/usr/bin';
 
-my $version = '2.5(3) (Good Bowl)';
+my $version = '3.0';
 my $config = "/etc/minimalist.conf";
 
 #####################################################
