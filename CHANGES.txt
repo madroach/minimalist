@@ -1,3 +1,11 @@
+Minimalist 3.0 (Aug 2, 2012)
+
+ . Project adopted by Christopher Zimmermann <madroach@gmerlin.de>
+ . use Net::SMTP smtp client as alternative to sendmail binary
+ . chroot and drop privileges when running setuid root
+ . Make it perl taint clean (removed all evals, ``, execs, forks...)
+ . Probably introduced many bugs in the process. Not fully tested yet.
+
 Minimalist 2.5(3)		(Jun 17, 2005)
 
  . Fixed few annoying errors in parsing headers

@@ -2,11 +2,10 @@
 
 I. Common information
 
-Minimalist is a MINImalist MAiling LIST manager. It is fast, extremely easy
-to setup and support. It is written in Perl and fully tested on FreeBSD and
-Linux, where it works pretty well. However there aren't causes not to use
-Minimalist on any other Unix system, because it doesn't use any
-system-dependent features.
+Minimalist is a MINImalist MAiling LIST manager. It is fast, extremely easy 
+to setup and support. It is written in Perl and tested on OpenBSD/OpenSMTPd.
+However there aren't causes not to use Minimalist on any other Unix system,
+because it doesn't use any system-dependent features.
 
 Minimalist has these features:
 
@@ -35,10 +34,11 @@ Minimalist has a notion of 'administrators' (global and per-list). They
 have full rights to manipulate subscription of other users and get any
 information, related to lists and users.
 
-Basic language of Minimalist is English, additional languages can be found
-either in distribution (in directory languages/) or on Web, at
-http://www.mml.org.ua/languages/. There is also README, which explains how
-to use these languages.
+Basic language of Minimalist is English, additional translations can be found
+either in distribution (in directory translations/) or on Web, at
+https://github.com/madroach/minimalist/tree/master/translations.
+New translations can easily be created using an existing translation as
+template. See alse perl Maketext: http://perldoc.perl.org/Locale/Maketext.html
 
 Commands may be either in subject of message (one command per message)
 or in body (one or more commands, one per line). Batched processing starts
@@ -76,13 +76,13 @@ mode <list> <email> <mode> :
       * 'reset' - clear all modes for specified user
 
 suspend <list> :
-    Stop receiving of messages from specified mailing list
+    (obsolete) Stop receiving of messages from specified mailing list
 
 resume <list> :
-    Restore receiving of messages from specified mailing list
+    (obsolete) Restore receiving of messages from specified mailing list
 
 maxsize <list> <size> :
-    Set maximum size (in bytes) of messages, which user wants to receive
+    (obsolete) Set maximum size (in bytes) of messages, which user wants to receive
 
 which [<email>] :
     Return list of lists to which user is subscribed
@@ -117,9 +117,11 @@ II. Install
 
 To install, place minimalist.pl somewhere (in /usr/local/sbin for example).
 This path must be accessible for MTA and minimalist.pl must be executable
-by your MTA.
+by your MTA. It is recommended to set the script suid root. Minimalist will 
+then chroot and then drop privileges to the user set in the config file or to 
+its real uid.
 
-Then copy minimalist.conf-sample to /usr/local/etc/minimalist.conf. If you
+Then copy minimalist.conf-sample to /etc/minimalist.conf. If you
 wish to have it in different location, you will use '-c' command-line
 directive, followed by full path and name of file, where appropriate config
 located (for example: minimalist.pl -c /etc/minimalist.conf ). Set
@@ -131,38 +133,29 @@ message to the program. The often place of aliases file is /etc/aliases.
 Add this line at the end of file:
 
 minimalist:		"|/usr/local/sbin/minimalist.pl"
+(if your MTA adds a delivered-to: header)
+
+or if it doesn't:
+
+minimalist:		"|/usr/local/sbin/minimalist.pl minimalist"
 
 and, if your MTA requires, do all it need to actualize changes.
 
-After this you must create directory which Minimalist will use for work.
-It is defined in the minimalist.conf by directive 'directory'. This
-directory must be *WRITABLE* by your MTA (check next section for information
-on how to detect Minimalist's EUID/EGID).
+After this you must create a directory which Minimalist will use for work.
+It is defined in the minimalist.conf by directive 'directory'. In this  
+directory you need at least "lists" and "auth" subdirectorys. Optionally you 
+can create a "translations" subdirectory where you can put perl Maketext 
+translation files. Of course all directories need to be readable by 
+minimalist. The auth directory must also be writable.
 
 ----------------------------------------------------------------------------
 III. Creating lists
 
-1. In the main Minimalist's directory create directory, named exactly as
-list you creating. This directory and it's contents must be owned by
-uid/gid of your MTA (it's because Minimalist will write here some control
-information - subscribed users, archived messages, etc). The simple and right
-method to know MTA's euid/egid is:
+1. In the "lists" directory, create a directory, named exactly as the
+list you are creating. In this directory minimalist probably needs write 
+access to files "list", "list-writers" and maybe the directory "archive".
 
- . create in /etc/aliases such entry:
- 	mtaid:	"|tee /tmp/mtaid.tst"
- . mail message to mtaid
- . check owner/group of resulted /tmp/mtaid.tst and chown main Minimalist's
-   directory (and all subsequent) to this owner/group
- . delete 'mtaid' alias from /etc/aliases
-
-2. Add list's name and short description of it into lists.lst file (in the
-main Minimalist's directory). This file will be shown by the command
-<info>. Example of this file's contents:
-
-list	This is testing list
-info	General information, news, etc
-
-3. Create in the list's directory some files:
+2. Create in the list's directory some files:
 
  a) config
      Private settings for this list, they override global parameters.
@@ -217,6 +210,12 @@ There are some useful macros can be used in 'info' and 'footer' files:
 
 4. Add list's aliases to /etc/aliases file:
 
+list:		"|/usr/local/sbin/minimalist.pl"
+list-owner:	user@somewhere
+(if your MTA adds a delivered-to: header)
+
+or if it doesn't:
+
 list:		"|/usr/local/sbin/minimalist.pl list"
 list-owner:	user@somewhere
 
@@ -236,7 +235,7 @@ now. You should use any third-party program.
 ----------------------------------------------------------------------------
 IV. Check configuration
 
-You always can check configuration with command:
+You always can check your configuration with:
 
  minimalist.pl - [listname [listname ... ]]
  
@@ -247,9 +246,12 @@ changes either in global configuration file or in list's config.
 ----------------------------------------------------------------------------
 V. Security
 
-Information about how to get administrative privileges, stored in global
+Information on how to get administrative privileges may be stored in global
 and private configs. You must set owner and permissions of this configs to
-allow your MTA access configs and disallow access for unprivileged users.
+allow minimalist to access these configs, but disallow access for unprivileged 
+users.
+If run setuid root, minimalist will read the main configuration before 
+chrooting, so you may set more restrictive permissions on that file.
 
 ----------------------------------------------------------------------------
 VI. Internals

@@ -4,9 +4,9 @@
 #          These directives can be used only in global config        #
 #--------------------------------------------------------------------#
 
-# The directory for Minimalist's files - default to /var/spool/minimalist
+# The directory for Minimalist's files - default to /var/db/minimalist
 #
-#directory = /var/spool/minimalist
+#directory = /var/db/minimalist
 
 # Administrator password. It applies to all lists, regardless to
 # authentication settings in these lists. For per-list authentication see
@@ -45,7 +45,7 @@
 
 # Log requests to Minimalist. Can be either "none" or path to logfile.
 #
-# Default to none
+# Default is no logfile
 #
 #logfile = /var/log/Minimalist.log
 
@@ -57,18 +57,11 @@
 
 # Run in background. If 'yes', Minimalist uses fork for detach from MTA and
 # continues execution in background.
+# TODO: Works only for messages to list. Not yet for commands.
 #
 # Default to 'no'
 #
 #background = yes
-
-# Preprocessing filter. Passes entire incoming message to external program
-# (in specified order) for some processing (for example, antivirus
-# check). Program MUST return result on standart output.
-#
-# Default to no filters.
-#
-#prefilter = /usr/local/bin/antivirus -d /var/spool/avdb : /usr/bin/tee /tmp/message.dbg
 
 #-------------------------------------------------------------------#
 #  These directives can be used either in global and local configs  #
@@ -77,7 +70,7 @@
 # The Minimalist administrator's e-mail address.
 #
 # Default to postmaster@primary_domain, where primary_domain is the result
-# of the `hostname --fqdn` command
+# of the "hostname" command
 #
 #admin = doka@kiev.sovam.com
 
@@ -122,10 +115,9 @@
 #errors to = admin
 
 # The list's language
-# en=English / ru=Russian / de=informal German / DE=formal German /
-# NL=Dutch
+# en=English / de=German
 #
-# See contrib/languages directory for further information
+# See translations directory for available translations
 #
 # language = en
 
@@ -138,26 +130,17 @@
 #
 #charset = koi8-r
 
-# Path to sendmail, default to '/usr/sbin/sendmail'
+# Delivery method. Either path to sendmail executable or smtp host:port:
 #
-#sendmail = /usr/sbin/sendmail
+# Default is the systems default smtp server as take from
+# $NetConfig{smtp_hosts} or if this is not defined, localhost.
+#
+#delivery = localhost:25
+#delivery = mail.example.com:25
+#delivery = /usr/sbin/sendmail
 
-# Delivery method. Can be 'internal' - Minimalist will send message by
-# itself and 'alias' - Minimalist will send message to specified address,
-# which can points to bulkmailer, etc.
+# The domain name - default to `hostname`.
 #
-# Note, that using 'alias' automatically sets value of 'errors to' to
-# 'sender'.
-#
-# Default to 'internal'. Syntax is:
-#
-#delivery = internal
-#delivery = alias e-mail
-
-# The domain name - default to `hostname --fqdn`. If begins with '|' then
-# Minimalist calls external program to determine hostname.
-#
-#domain = |uname -n
 #domain = kiev.sovam.com
 
 # Security level:
@@ -211,7 +194,7 @@
 # choices: 'no', 'yes' or e-mail. If used 'no' (default), Minimalist doesn't
 # touch this header at all. If used 'yes', Minimalist sets Reply-To: header
 # to list's address instead of original contents.
-# 
+#
 # The third choice is available ONLY in per-list config - if used any other
 # value, Reply-To: will be set to this value. BE CAREFUL and use correct
 # RFC-822 compliant E-mail here.
