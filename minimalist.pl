@@ -34,6 +34,7 @@ use Fcntl ':flock';	# LOCK_* constants
 use Carp;
 use Net::Config qw(%NetConfig);
 use Net::SMTP;
+require File::Spec;
 require Digest::MD5;
 require MIME::QuotedPrint;
 require MIME::Base64;
@@ -117,7 +118,7 @@ my %global_conf = (
   list_gecos => '',
   listdir => 'lists',
   listinfo => 'yes',
-  logfile => 'none',
+  logfile => undef,
   logmessages => 'no',
   maxrcpts => 20,
   maxsize => 0,		# Maximum allowed size for message (incl. headers)
@@ -160,8 +161,12 @@ my %conf = read_config($config, 'global');
 @global_conf{keys %conf} = values %conf;
 %conf = %global_conf;
 
-open LOG, '>>', "$conf{logfile}" or warn "Can't open $conf{logfile}: $!";
-unless(-t STDERR || $conf{logfile} eq 'none') {
+if (defined $conf{logfile}) {
+  open LOG, '>>', "$conf{logfile}" or warn "Can't open $conf{logfile}: $!" }
+else {
+  open LOG, '>', File::Spec->devnull or warn "Can't open null device: $!" }
+
+unless(-t STDERR) {
   open STDOUT, ">&LOG" or warn "Can't redirect STDOUT: $!";
   open STDERR, ">&LOG" or warn "Can't redirect STDERR: $!";
   select LOG;
@@ -195,7 +200,7 @@ $maketext = Translation::en->new() || die "Language?";
 
 -d $conf{directory} or die "$conf{directory} is not a directory.";
 
-# $< and $( are real [ug]ds, $> and $) are effective [ug]ds
+# $< and $( are real [ug]id, $> and $) are effective [ug]id
 if ($> == 0 && $< != 0) {
   my $uid;
   my $gid = getgrnam('nogroup');
@@ -241,7 +246,7 @@ if (defined $ARGV[0] && $ARGV[0] eq '-') {
   print	"================= Global configuration ================\n".
 	"Directory: $lconf{directory}\n".
 	"User: $lconf{user}\n".
-	"Administrative password: ".($lconf{adminpwd} =~ /^_.*_$/ ? "not defined\n" : "ok\n").
+	"Administrative password: ".(defined $lconf{adminpwd} ? "ok\n" : "not defined\n").
 	"Logging: $lconf{logfile}\n".
 	"Language: $lconf{language}\n".
 	"Log info about messages: $lconf{logmessages}\n".
@@ -291,12 +296,12 @@ if (defined $ARGV[0] && $ARGV[0] eq '-') {
 	$conf{listpwd} =~ /^_.*_$/ ? "not defined" : "Ok")."\n";
     }
 
-    print "Sendmail: $lconf{sendmail}\n".
+    print
 	"Domain: $lconf{domain}\n".
 	"Security: $lconf{security}\n".
 	"Archiving: $lconf{archive}\n".
-	  ($lconf{archive} ne 'no' ? " * Archiver: $lconf{archpgm}\n" . ($lconf{arcsize} != 0 ? " * Maximum message size: $lconf{arcsize} bytes\n" : "") : "")
-	  .
+	($lconf{archive} ne 'no' ? " * Archiver: $lconf{archpgm}\n" . ($lconf{arcsize} != 0 ? " * Maximum message size: $lconf{arcsize} bytes\n" : "") : "")
+	.
 	"Status:";
     if ($lconf{status}) {
       print " read-only" if ($lconf{status} & $RO);
@@ -388,7 +393,7 @@ if (defined $ARGV[0] && $ARGV[0] eq '-') {
   if ($header =~ /^From (.*)\n/i) {
     exit 0 if ($1 =~ /(MAILER-DAEMON|postmaster)@/i); }
 
-# Extract $list from Delivered-To:
+# Extract $list from command line or Delivered-To:
   if ($ARGV[0]) { $list = $ARGV[0] }
   elsif ($header =~ /(^|\n)delivered-to: (.*)\n/i) {
     $list = $2; $list =~ s/@.*//; }
@@ -644,7 +649,7 @@ _EOF_
     send_message("Subject: $subject", $body, $mailto)
   }
   else {		# Ok, all checks done.
-    logCommand($from, "L=\"$list\" T=\"$orig_subj\" S=".(length($header) + length($body))) if ($conf{logmessages} ne 'no' && $conf{logfile} ne 'none');
+    logCommand($from, "L=\"$list\" T=\"$orig_subj\" S=".(length($header) + length($body))) if ($conf{logmessages} ne 'no');
 
     $conf{archive} = 'no' if ($conf{arcsize} && length ($body) > $conf{arcsize});
     if ($conf{archive} eq 'pipe') { arch_pipe($header, $body); }
@@ -1032,8 +1037,7 @@ else {
 	    }
 	  }
 
-	  if ($conf{logfile} ne 'none') {
-	    logCommand($from, "$cmd $list".($email eq $from ? "" : " $email")." @params"); }
+	  logCommand($from, "$cmd $list".($email eq $from ? "" : " $email")." @params");
 	}
 	else { $msg .=
 	  "\n".
@@ -1056,7 +1060,7 @@ else {
 	  mt('You are not allowed to get subscriptions of other users.');
 	}
 	else {
-	  logCommand($from, $line) if ($conf{logfile} ne 'none');
+	  logCommand($from, $line);
 	  $email = $from unless (defined $email);
 
 	  $msg .= mt('Current subscriptions of [_1]:', $email). "\n\n";
@@ -1086,7 +1090,7 @@ else {
       }
 
       when ('info') {
-	logCommand($from, $line) if ($conf{logfile} ne 'none');
+	logCommand($from, $line);
 	my @lists;
 	if (my $list = shift @cmd) {
 	  # Process only specified list
@@ -1151,7 +1155,7 @@ else {
       when ('who') {
 	if (verify($from, $password)) {
 	  my @whoers;
-	  logCommand($from, $line) if ($conf{logfile} ne 'none');
+	  logCommand($from, $line);
 	  if (open(LIST, "$conf{listdir}/$list/list")) {
 	    while (my $ent = <LIST>) {
 	      chomp $ent;
@@ -1185,7 +1189,7 @@ else {
 	
 	if (verify($from, $password)) {
 	  $msg .= subscribe($list, $from, $email);
-	  logCommand($from, $line) if ($conf{logfile} ne 'none');
+	  logCommand($from, $line);
 	}
 	elsif ($conf{status} & $CLOSED) {
 	  $msg .=
@@ -1201,7 +1205,7 @@ else {
 	else {
 	  if ($conf{security} ne 'paranoid') {
 	    $msg .= subscribe($list, $from, $email);
-	    logCommand($from, $line) if ($conf{logfile} ne 'none');
+	    logCommand($from, $line);
 	  }
 	  else {
 	    genAuth($list, $from, $line, $_);
@@ -1215,7 +1219,7 @@ else {
 	
 	if (verify($from, $password)) {
 	  $msg .= unsubscribe($list, $from, $email);
-	  logCommand($from, $line) if ($conf{logfile} ne 'none');
+	  logCommand($from, $line);
 	}
 	elsif ($conf{status} & $MANDATORY) {
 	  $msg .=
@@ -1232,7 +1236,7 @@ else {
 	else {
 	  if ($conf{security} ne 'paranoid') {
 	    unsubscribe($list, $from, $email);
-	    logCommand($from, $line) if ($conf{logfile} ne 'none');
+	    logCommand($from, $line);
 	  }
 	  else {
 	    genAuth($list, $from, $line, $_);
@@ -1245,7 +1249,7 @@ else {
       when ('suspend' || 'resume') {
 	if (verify($from, $password) || $conf{security} ne 'paranoid') {
 	  $msg = chgSettings($msg, $_, $list, $from, $from);
-	  logCommand($from, $line) if($conf{logfile} ne 'none');
+	  logCommand($from, $line);
 	}
 	else { genAuth($list, $from, $line, $_); }
       }
@@ -1255,7 +1259,7 @@ else {
 	if ((shift @cmd) =~ /^\d+$/) {
 	  if (verify($from, $password) || $conf{security} ne 'paranoid') {
 	    $msg = chgSettings($_, $list, $from, $from, $1);
-	    logCommand($from, $line) if($conf{logfile} ne 'none');
+	    logCommand($from, $line);
 	  }
 	  else { genAuth($list, $from, $line, $_, $1); }
 	}
@@ -1303,11 +1307,11 @@ else {
 
 	if (verify($from, $password)) {
 	  $msg .= chgSettings($mode, $list, $from, $email, $args[0]);
-	  logCommand($from, $line) if($conf{logfile} ne 'none');
+	  logCommand($from, $line);
 	}
 	elsif ($userallowed && $email eq $from && $conf{security} ne 'paranoid') {
 	  $msg .= chgSettings($mode, $list, $from, $email, $args[0]);
-	  logCommand($from, $line) if($conf{logfile} ne 'none');
+	  logCommand($from, $line);
 	}
 	elsif ($userallowed && $email eq $from) {
 	  genAuth($list, $from, $line, $_, $mode, @args); }
@@ -1815,7 +1819,7 @@ sub expand_lists {
  @result;
 }
 
-#.......... Read file and substitute all macroses .........
+#.......... Read file and substitute all macros .........
 sub read_info ($$) {
  my ($list, $file) = @_;
  my $fname = "$conf{listdir}/$list/$file";
@@ -1889,9 +1893,9 @@ sub genAuth ($$$$;@) {
 
   my $authcode = Digest::MD5::md5_hex(int(rand(2**32)));
 
-  mkdir (".auth", 0750) if (! -d '.auth');
+  mkdir ("auth", 0750) if (! -d 'auth');
 
-  open AUTH, ">.auth/$authcode";
+  open AUTH, ">auth/$authcode";
   print AUTH "$cmd $list $from ". join(' ', @params). "\n";
   close AUTH;
 
@@ -1912,7 +1916,7 @@ sub getAuth ($) {
   my $authcode = shift;
 
   if ($authcode =~ /^([\dabcdef]+)$/) {
-    my $authfile = ".auth/$1";
+    my $authfile = "auth/$1";
     if (open AUTH, $authfile) {
       my $authtask = <AUTH>; chomp $authtask;
       close AUTH; unlink $authfile;
@@ -1928,7 +1932,7 @@ sub getAuth ($) {
 sub cleanAuth {
 
  my $now = time;
- my $dir = ".auth";
+ my $dir = "auth";
  my $mark = "$dir/.lastclean";
  my $auth_seconds = $conf{auth_valid} * 3600;	# Convert hours to seconds
 
