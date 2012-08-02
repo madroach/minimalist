@@ -1,0 +1,406 @@
+############## Main configuration file for Minimalist ################
+
+#--------------------------------------------------------------------#
+#          These directives can be used only in global config        #
+#--------------------------------------------------------------------#
+
+# The directory for Minimalist's files - default to /var/spool/minimalist
+#
+#directory = /var/spool/minimalist
+
+# Administrator password. It applies to all lists, regardless to
+# authentication settings in these lists. For per-list authentication see
+# directive 'auth' below.
+#
+# Password must be in very first line and first column of message's body,
+# as follows (without quotes): '*password: this_secret_password'
+#
+# By default this password isn't empty, but undefined, so if you want use
+# it, you must define it here.
+#
+#password = this_secret_password
+
+# Time while authentication request is valid, in hours
+# Default to 24 hours
+#
+#request valid = 12
+
+# Access control list, used for limiting access to Minimalist. Delimiter
+# for items is ':'. Item, which begins with '@', means path to filename
+# with items list, one item per row.
+#
+# Default is empty
+#
+#blacklist = !small.domain.com:domain.com:spamdomain.org:@/path/to/blacklist.txt
+#
+# In this example mails from small.domain.com will be allowed to work with
+# Minimalist, mails from domain.com will be disallowed, and further, on the
+# 'first match' basis.
+
+# Robots (like MLM=mailing list managers) usually should be blocked
+# otherwise two minimalists could be ping-ponging help/subscribe messages
+# to each other infinitely. Delimiter is '|'.
+#
+#blocked robots = 'X-List-Server|List-Id|List-Subscribe|X-Yahoo-Newman-Property';
+
+# Log requests to Minimalist. Can be either "none" or path to logfile.
+#
+# Default to none
+#
+#logfile = /var/log/Minimalist.log
+
+# Log info about messages, passed through Minimalist. Can be 'yes' or 'no'
+#
+# Default to 'no'. logfile (see above) to 'none' implies 'no'
+#
+#log messages = yes
+
+# Run in background. If 'yes', Minimalist uses fork for detach from MTA and
+# continues execution in background.
+#
+# Default to 'no'
+#
+#background = yes
+
+# Preprocessing filter. Passes entire incoming message to external program
+# (in specified order) for some processing (for example, antivirus
+# check). Program MUST return result on standart output.
+#
+# Default to no filters.
+#
+#prefilter = /usr/local/bin/antivirus -d /var/spool/avdb : /usr/bin/tee /tmp/message.dbg
+
+#-------------------------------------------------------------------#
+#  These directives can be used either in global and local configs  #
+#-------------------------------------------------------------------#
+
+# The Minimalist administrator's e-mail address.
+#
+# Default to postmaster@primary_domain, where primary_domain is the result
+# of the `hostname --fqdn` command
+#
+#admin = doka@kiev.sovam.com
+
+# Address for return miscellaneous delivery errors
+#
+# Available values are:
+# . drop - drop such error messages
+# . admin - send error messages to admin (see above)
+# . sender - send error messages to sender of original message
+# . verp - generate VERP (see below)
+# . RFC-822 E-mail - send error messages to arbitrary mailbox
+#
+# Default to 'drop'. Note, that 'sender' value is quite annoying for
+# message's sender and highly undesirable. When setuping new list it is
+# desirable to set this parameter to 'admin' for revealing adimistrator's
+# errors.
+#
+# Note about 'verp' (Variable Envelope Return Path).
+#
+# Prepare message so, that it will be possible to parse bounce messages.
+# For detailed description see original document at
+# http://cr.yp.to/proto/verp.txt
+# or it's copy at
+# http://www.mml.org.ua/verp.txt
+#
+# You must create one additional alias in your 'aliases' file, for
+# processing bounce messages. It must be something similar to:
+#
+#listname-owner-*:	"|/path/to/bouncer.pl"
+#
+# where 'listname' is the name of mailing list. Wildcard mask specifies,
+# that any message, where recipient's address starts on 'listname-owner-',
+# will be passed to bouncer.pl. Check your MTA documentation on how to
+# creare wilcard aliases.
+#
+# Distribution of Minimalist does not provide bounce processing program.
+# You should use any third-party program.
+#
+# CAUTION: if value set to 'verp', Minimalist will generate ONE MESSAGE per
+# RECIPIENT. On big lists this can produce very big load of server.
+#
+#errors to = admin
+
+# The list's language
+# en=English / ru=Russian / de=informal German / DE=formal German /
+# NL=Dutch
+#
+# See contrib/languages directory for further information
+#
+# language = en
+
+# The charset, which will be used in information messages and footer.
+#
+# Default is 'us-ascii'
+#
+# See docs/README for information on how Minimalist adds footer,
+# dependently on charset.
+#
+#charset = koi8-r
+
+# Path to sendmail, default to '/usr/sbin/sendmail'
+#
+#sendmail = /usr/sbin/sendmail
+
+# Delivery method. Can be 'internal' - Minimalist will send message by
+# itself and 'alias' - Minimalist will send message to specified address,
+# which can points to bulkmailer, etc.
+#
+# Note, that using 'alias' automatically sets value of 'errors to' to
+# 'sender'.
+#
+# Default to 'internal'. Syntax is:
+#
+#delivery = internal
+#delivery = alias e-mail
+
+# The domain name - default to `hostname --fqdn`. If begins with '|' then
+# Minimalist calls external program to determine hostname.
+#
+#domain = |uname -n
+#domain = kiev.sovam.com
+
+# Security level:
+# . none - allow any person write to any mailing list
+# . careful - only subscribers can write to list
+# . paranoid - user must authenticate subscribe/unsubscribe requests
+#
+# Default to 'careful'
+#
+#security = none
+
+# Archiving strategy:
+#  . no - don't archive articles
+#  . daily - create new directory for articles every day
+#  . monthly - create new directory for articles every month
+#  . yearly - create new directory for articles every year
+# or
+#  archive = pipe /path/to/archiver [options]
+#
+# for instance
+#  archive = pipe /usr/local/bin/hypermail -m www-talk -d /archives/www-talk
+#
+# Default to 'no'
+#
+#archive = monthly
+
+# Maximum size of message (in bytes), which will be archived
+#
+# Default - zero (no limits)
+#
+#archive size = 1000000
+
+# List's status. Available values are:
+# . open - list without any restrictions
+# . ro - read-only access to list
+# . closed - only trusted users can subscribe anyone to this list.
+# . mandatory - subscribed users can't unsubscribe
+#
+# Values may be used together, for example: closed,ro,mandatory
+#
+# Default to 'open'
+#
+#status = closed,ro,mandatory
+
+# Copy to sender - indicates send or no message to message's sender
+# Default to yes
+#
+#copy to sender = no
+
+# This variable defines Reply-To: contents of outgoing message. Available
+# choices: 'no', 'yes' or e-mail. If used 'no' (default), Minimalist doesn't
+# touch this header at all. If used 'yes', Minimalist sets Reply-To: header
+# to list's address instead of original contents.
+# 
+# The third choice is available ONLY in per-list config - if used any other
+# value, Reply-To: will be set to this value. BE CAREFUL and use correct
+# RFC-822 compliant E-mail here.
+#
+# Please check the following URL on why you (most often) should not use
+# this feature: http://www.unicom.com/pw/reply-to-harmful.html (Thanks to
+# Jonas Bofjall for pointing to this topic)
+#
+# Default to 'no'
+#
+#reply-to list = yes
+
+# Set From: to specified value (RFC-822 compliant E-mail address) in
+# outgoing message.
+#
+# Default - don't touch From:
+#
+#from = doka@kiev.sovam.com
+
+# Modify subject before sending message to subscribers.
+#
+# Available values:
+#  no   : don't touch subject
+#  yes  : add "[list_name] " before original subject
+#  more : remove leading "Re: " if it's there and then add "[list_name] "
+#
+# Default to yes
+#
+#modify subject = no
+
+# Maximal count of subscribers per list, zero means no limits.
+# Default to zero
+#
+#maxusers = 100
+
+# Count of recipients per message. If not zero, Minimalist will generate
+# few messages with maxrcpts recipients instead of one message to all
+# recipients.
+#
+# Allowed value from 1 to 50, default to 10
+#
+# Be careful when using high values, because this may lead to lost some
+# recipients in mailing if total length of addresses will exceed allowed
+# length of command line, passed to MTA.
+#
+#maxrcpts = 15
+
+# Delay (in seconds) between deliveries, if there are few ones per message.
+#
+# Default to none
+#
+#delay = 15
+
+# Maximal size of message
+# Default to none
+#
+#maxsize = 100000
+
+# Include list information headers (RFC 2369) in outgoing mail. These
+# directives are: List-Help, List-Subscribe, List-Unsubscribe, List-Post,
+# List-Owner and, optionally, List-Archive.
+#
+# Available values are: 'no', 'yes' or URL, which points to archive, in
+# form: <URL> (Comment)
+#
+# Example:
+# list information = <http://www.yahoo.com/> (Archive of everything)
+#
+# Note: comment is optional and may be avoided. Using URL as value in this
+# directive implies 'yes' to all rest List-* headers and available only in
+# per-list config.
+#
+# Default value is 'yes'
+#
+#list information = no
+
+# Strip various "Receipt Request" headers. Currently there are:
+#
+#  . Return-Receipt-To
+#  . Disposition-Notification-To
+#  . X-Confirm-Reading-To
+#
+# Default not to strip
+#
+#strip rrq = yes
+
+# Add extra headers. It is possible to use this option two and more times -
+# Minimalist will glue all these headers, when producing final message.
+# Also it is possible to use macroses (if applicable) \a (admin), \d
+# (domain), \l (list), \o (owner), \n (newline), \t (tab) and \s (space) in
+# these headers.
+#
+# WARNING! Minimalist doesn't check validity of these headers nor their
+# duplicating! Be carefull while using this option.
+#
+#extra header = X-BeenThere: \l@\d
+#
+# By using \n, \t and \s it is possible to construct multiline headers, for
+# example:
+#
+#extra header = X-Multline: first line\n\t second line\n\t third line
+#
+# the same result may be achieved by combining few directives:
+#
+#extra header = X-Multilne: first line
+#extra header = \t second line
+#extra header = \t third line
+
+# Remove 'Resent-*' headers in incoming mail. These headers are not
+# important for message understanding and processing, but some MUA's
+# generate incorrect these ones.
+#
+# Default not to remove.
+#
+#remove resent = yes
+
+# Modify Message-ID in outgoing message.
+#
+# If somefirstbody subscribed on two lists on same server and
+# somesecondbody crossposts message to these lists and
+# somefirstbody's MTA doesn't allow two and more messages with
+# same Message-ID, then this first body will receive message only
+# once. In this case modification of original message's Message-ID
+# will solve this problem.
+#
+# Modification is done by adding token 'MMLID_xxxxx-' before the
+# original Message-ID, where xxxxx is some number between 0 and 99999
+#
+# Default do not touch Message-ID.
+#
+#modify message-id = yes
+
+# Send message on subscribe/unsubscribe event to list owner
+#
+# Default to no
+#
+#cc on subscribe = yes
+
+#------------------------------------------------------------------#
+#       These directives can be used in local configs only         #
+#------------------------------------------------------------------#
+
+# Authentication scheme for list.
+#
+# NOTE: By default there is 'password' scheme with undefined password, so
+# if you want to make administrative requests to list, you must define this
+# scheme explicitly.
+#
+# Examples:
+#
+# auth = mailfrom doka@kiev.sovam.com:@/usr/local/etc/list.admins
+#	List users, allowed to make administrative requests. Their e-mails
+#	delimited by ':', item, beginnig with '@' means filename with list
+#	of persons, one person's e-mail per one row.
+#
+# auth = password this_secret_password
+#	Password, which opens administrative access to list. Must be in
+#	very first line and first column of message's body, as follows
+#	(without quotes): '*password: this_secret_password'
+#
+#auth = mailfrom doka@kiev.sovam.com:@/usr/local/etc/mml.trusted
+#auth = password this_secret_password
+
+# List's GECOS.
+#
+# Add gecos to headers 'To' and, optionally, 'Reply-To', when sending
+# message to subscribers. For example, using:
+#
+# list gecos = Minimalist General Discussion
+#
+# will produce
+#
+# To: Minimalist General Discussion <mml-general@kiev.sovam.com>
+# Reply-To: Minimalist General Discussion <mml-general@kiev.sovam.com>
+#
+# in outgoing message.
+#
+# Default: empty
+#
+#list gecos = Test GECOS
+
+# Fill header 'To' of outgoing message with recipient's address.
+#
+# Note: if set to 'yes', Minimalist will remove all rest 'To' and 'Cc'
+# headers from message.
+#
+# CAUTION: if set to 'yes', Minimalist will generate ONE MESSAGE per
+# RECIPIENT. On big lists this can produce very big load of server.
+#
+# Default to 'no'
+#
+#to recipient = yes
