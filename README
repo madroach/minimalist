@@ -121,12 +121,11 @@ by your MTA. It is recommended to set the script suid root. Minimalist will
 then chroot and then drop privileges to the user set in the config file or to 
 its real uid.
 
-Then copy minimalist.conf-sample to /etc/minimalist.conf. If you
-wish to have it in different location, you will use '-c' command-line
-directive, followed by full path and name of file, where appropriate config
-located (for example: minimalist.pl -c /etc/minimalist.conf ). Set
-variables in config accordingly to your needs (defaults are useful in most
-cases).
+Then copy minimalist.conf to /etc/minimalist.conf. If you wish to have it in
+different location, you will use '-c' command-line directive, followed by full
+path and name of file, where appropriate config located (for example:
+minimalist.pl -c /etc/minimalist.conf ). Set variables in config accordingly to
+your needs (defaults are useful in most cases).
 
 The next step is to create alias for minimalist, which pipes received
 message to the program. The often place of aliases file is /etc/aliases.
@@ -156,6 +155,8 @@ list you are creating. In this directory minimalist probably needs write
 access to files "list", "list-writers" and maybe the directory "archive".
 
 2. Create in the list's directory some files:
+     An example can be found in the distributions
+     "lists/minimalist-example" directory.
 
  a) config
      Private settings for this list, they override global parameters.
@@ -201,12 +202,12 @@ access to files "list", "list-writers" and maybe the directory "archive".
      which has references to some other resources, to animated GIFs or
      Flash programs.
 
-There are some useful macros can be used in 'info' and 'footer' files:
+     There are some useful macros can be used in 'info' and 'footer' files:
 
- \a	will be expanded to administrator's email
- \d	will be expanded to <domain>
- \l	will be expanded to <list>
- \o	will be expanded to <list>-owner@<domain>
+      \a	will be expanded to administrator's email
+      \d	will be expanded to <domain>
+      \l	will be expanded to <list>
+      \o	will be expanded to <list>-owner@<domain>
 
 4. Add list's aliases to /etc/aliases file:
 
@@ -219,7 +220,7 @@ or if it doesn't:
 list:		"|/usr/local/sbin/minimalist.pl list"
 list-owner:	user@somewhere
 
-If you are using VERP for bounce processing (see minimalist.conf-sample for
+If you are using VERP for bounce processing (see minimalist.conf for
 information about directive 'verp'), you must add one more alias, something
 like to:
 
@@ -270,11 +271,6 @@ in format one file per one message. DON'T DELETE "SEQUENCE" file in this
 directory - there is a number of a last archived message!
 
 VII. Enjoy :)
-
-Directory sample/ in the distribution contains examples of configuration
-files. Directory docs/FAQ contains some FAQs, contrib/ - some third party
-supporting programs (please, note, that author doesn't aware about their
-functionality and damage possibility).
 
 There is mailing list about Minimalist. Please, mail to
 	minimalist@kiev.sovam.com
