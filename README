@@ -130,7 +130,7 @@ The next step is to create alias for minimalist, which pipes received
 message to the program. The often place of aliases file is /etc/aliases.
 Add this line at the end of file:
 
-minimalist:		"|/usr/local/sbin/minimalist.pl"
+minimalist:		|/usr/local/sbin/minimalist.pl
 (if your MTA adds a delivered-to: header)
 
 or if it doesn't:
@@ -210,7 +210,7 @@ access to files "list", "list-writers" and maybe the directory "archive".
 
 4. Add list's aliases to /etc/aliases file:
 
-minimalist-example:		"|/usr/local/sbin/minimalist.pl"
+minimalist-example:		|/usr/local/sbin/minimalist.pl
 minimalist-example-owner:	user@somewhere
 (if your MTA adds a delivered-to: header)
 
@@ -223,7 +223,7 @@ If you are using VERP for bounce processing (see minimalist.conf for
 information about directive 'verp'), you must add one more alias, something
 like to:
 
-minimalist-example-owner-*:	"|/path/to/bounce_processing_tool.pl"
+minimalist-example-owner-*:	|/path/to/bounce_processing_tool.pl
 
 Wildcard mask specifies, that any message, where recipient's address starts
 on 'list-owner-', will be passed to bounce_processing_tool.pl. Check your
