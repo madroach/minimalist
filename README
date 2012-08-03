@@ -4,14 +4,13 @@ I. Common information
 
 Minimalist is a MINImalist MAiling LIST manager. It is fast, extremely easy 
 to setup and support. It is written in Perl and tested on OpenBSD/OpenSMTPd.
-However there aren't causes not to use Minimalist on any other Unix system,
+However there are no causes not to use Minimalist on any other Unix system,
 because it doesn't use any system-dependent features.
 
 Minimalist has these features:
 
  . subscribe/unsubscribe users by request
     * including write-only option of subscription
- . several levels of security
  . read-only/closed/mandatory lists
  . information about list; users, subscribed to list; lists, to which user
     subscribed
