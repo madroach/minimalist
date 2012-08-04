@@ -45,7 +45,7 @@ require POSIX;
 delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
 $ENV{'PATH'} = '/bin:/usr/bin';
 
-my $version = '3.0';
+my $version = '3.1';
 my $config = "/etc/minimalist.conf";
 
 #####################################################
@@ -335,7 +335,6 @@ if (defined $ARGV[0] && $ARGV[0] eq '-') {
     $msg .= " * $lconf{directory} doesn't exist!\n" if (! -d $lconf{directory});
     $msg .= " * Invalid 'log messages' value '$lconf{logmessages}'\n" if ($lconf{logmessages} !~ /^yes$|^no$/i);
     $msg .= " * Invalid 'background' value '$lconf{background}'\n" if ($lconf{background} !~ /^yes$|^no$/i);
-    $msg .= " * Invalid domain '$lconf{domain}'\n" if ($lconf{domain} !~ /^(\w[-\w]*\.)+[a-z]{2,4}$/i);
     $msg .= " * Invalid security level '$lconf{security}'\n" if ($lconf{security} !~ /^none$|^careful$|^paranoid$/i);
     $msg .= " * Invalid 'copy to sender' value '$lconf{copy_sender}'\n" if ($lconf{copy_sender} !~ /^yes$|^no$/i);
     $msg .= " * Invalid 'modify subject' value '$lconf{modify_subject}'\n" if ($lconf{modify_subject} !~ /^yes$|^no$|^more$/i);
@@ -349,7 +348,7 @@ if (defined $ARGV[0] && $ARGV[0] eq '-') {
     $msg .= " * Invalid 'remove resent' value '$lconf{remove_resent}'\n" if ($lconf{remove_resent} !~ /^yes$|^no$/i);
     my $translation = "$lconf{translationpath}/$lconf{language}";
     $msg .= " * Invalid 'to recipient' value '$lconf{to_recipient}'\n" if ($lconf{to_recipient} !~ /^yes$|^no$/i);
-    $msg .= " * Translation file $translation not available'\n" unless (-f $translation);
+    $msg .= " * Translation file $translation not available'\n" unless (-f $translation || $lconf{language} eq "en");
     if ($lconf{archive} eq 'pipe') {
       (my $arpg, ) = split(/\s+/, $lconf{archpgm}, 2);
       $msg .= " * $arpg doesn't exists!\n" unless (-x $arpg);
