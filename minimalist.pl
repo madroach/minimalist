@@ -1976,7 +1976,6 @@ sub logCommand ($$) {
 
  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime;
  $year += 1900;
- $mon++;
 
  printf LOG "%s %02d %02d:%02d %d %s\n",
    (qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec))[$mon],
