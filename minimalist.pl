@@ -147,6 +147,8 @@ END { $smtp->quit() if(defined $smtp) }
 my $password = 0;
 my $maketext;
 my %msgtxt;
+# HASH of known lists - key is lowercase listname, value list directory.
+my %lists;
 my @blacklist;
 my @trusted;
 
@@ -235,6 +237,18 @@ if ($> == 0 && $< != 0) {
 @INC = ('.');
 
 ####################################################################
+# >>>>>>>>>>>>>>>>>>>>>> PREPARE HASH OF LISTS <<<<<<<<<<<<<<<<<<< #
+####################################################################
+
+opendir(LISTDIR, $conf{listdir}) || die "Cannot open $conf{listdir}!";
+while (readdir LISTDIR) {
+  warn "$_ list is found twice - maybe in differing case?" if (exists $lists{lc $_});
+  $lists{lc $1} = $1 if(/^([^\.].*)$/ && -d "$conf{listdir}/$_");
+}
+closedir LISTDIR;
+
+
+####################################################################
 # >>>>>>>>>>>>>>>>>>>>>>>> CHECK CONFIGURATION <<<<<<<<<<<<<<<<<<< #
 ####################################################################
 
@@ -275,7 +289,10 @@ if (defined $ARGV[0] && $ARGV[0] eq '-') {
     if ($ARGV[0] ne '-') {
       $ARGV[0] =~ /^([[:graph:]]+)$/;
       my $list = $1;
-      unless (-d "$conf{listdir}/$list") {
+      if (exists $lists{lc $list}) {
+	$list = $lists{lc $list};
+      }
+      else {
 	print " * There isn't such list \U$list\E\n\n";
 	shift; next;
       }
@@ -474,9 +491,9 @@ if (defined $ARGV[0] && $ARGV[0] eq '-') {
     my @rw;
     my @writeany;
 
-    if (-d "$conf{listdir}/$list") {
-      # directory exists, laundering $list.
-      $list =~ /^(.*)$/; $list = $1;
+    # normalize to exact directory name.
+    if (exists $lists{lc $list}) {
+      $list = $lists{lc $list};
     }
     else {
       $msg = <<_EOF_ ;
@@ -1015,8 +1032,8 @@ else {
 
 	my ($cmd, $list, $email, @params) = getAuth($authcode);
 
-	if ($cmd && -d "$conf{listdir}/$list") { # authentication code is valid and $list exists
-	  $list =~ /^(.*)$/; $list = $1;
+	if ($cmd && exists $lists{lc $list}) { # authentication code is valid and $list exists
+	  $list = $lists{lc $list};
 	  load_config($list);
 
 	  given ($cmd) {
@@ -1093,7 +1110,10 @@ else {
 	my @lists;
 	if (my $list = shift @cmd) {
 	  # Process only specified list
-	  if (! -d "$conf{listdir}/$list") {
+	  if (exists $lists{lc $list}) {
+	    $lists[0] = $list;
+	  }
+	  else {
 	    $msg .=
 	    mt('ERROR:'). "\n\t".
 	    mt('There is no list ([_1]) here.', uc $list). "\n\n".
@@ -1101,17 +1121,9 @@ else {
 	    mt("Send a message to [_1] with a subject of 'info' (no quotes) for a list of available mailing lists.",
 	      "$conf{me}");
 	  }
-	  else {
-	    $lists[0] = $list;
-	  }
 	}
 	else {
-	  # Prepare list of all available lists
-	  opendir(my $dh, $conf{listdir}) || die;
-	  while (readdir $dh) {
-	    push @lists, $1 if(/^([^\.].*)$/ && -d "$conf{listdir}/$1");
-	  }
-	  closedir $dh;
+	  @lists = values %lists;
 	}
 	foreach my $list (@lists) {
 	  my $info = read_info($list, 'info');
@@ -1135,8 +1147,8 @@ else {
 	break;
       }
 
-      if ( -d "$conf{listdir}/$list") {
-	$list =~ /^(.*)$/; $list = $1; #laundering $list
+      if ( exists $lists{lc $list}) {
+	$list = $lists{lc $list};
 	load_config($list);
 
 	$owner = "$list-owner\@$conf{domain}";
