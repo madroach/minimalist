@@ -700,7 +700,7 @@ _EOF_
       elsif ( $trcpt =~ s/$second/$2/g ) { ($tmp_to_gecos = $3) =~ s/$spaces/$1/gs; }
       push(@rcpts, $trcpt = lc($trcpt));
 
-      $to_gecos = $tmp_to_gecos if ($tmp_to_gecos && $trcpt eq $list.'@'.$conf{domain});
+      $to_gecos = $tmp_to_gecos if ($tmp_to_gecos && $trcpt =~ /$list\@$conf{domain}/i);
     }
 
     # If there was To: and Cc: headers, put them back in message's header
@@ -708,7 +708,7 @@ _EOF_
       # If there is administrator's supplied GECOS, use it instead of user's supplied
       if ($conf{list_gecos}) {
 	for (my $i=0; $i<@hdrcpt; $i++) {
-	  if ($hdrcpt[$i] =~ /$list\@$conf{domain}/) {	# Yes, list's address
+	  if ($hdrcpt[$i] =~ /$list\@$conf{domain}/i) {	# Yes, list's address
 	    $hdrcpt[$i] =~ s/$second/$2/g if (! ($hdrcpt[$i] =~ s/$first/$3/g));
 	    $hdrcpt[$i] = "$conf{list_gecos} <$hdrcpt[$i]>";
 	  }
