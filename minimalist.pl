@@ -1752,7 +1752,9 @@ sub read_config ($$) {
 	      $nconf{archive} = "pipe"; }
 	    else {
 	      $nconf{archpgm} = 'BUILTIN';
-	      $nconf{archive} = lc($nconf{archive}); } }
+	      $nconf{archive} = lc($value);
+	    }
+	  }
 	  when ('status') {
 	    # Calculate mask for status
 	    my %strel = ("open", $OPEN, "ro", $RO, "closed", $CLOSED, "mandatory", $MANDATORY);
@@ -1768,7 +1770,8 @@ sub read_config ($$) {
 	  when ('maxusers') { $nconf{maxusers} = $value; }
 	  when ('maxrcpts') {
 	    $nconf{maxrcpts} = 20 if ($value < 1);
-	    $nconf{maxrcpts} = 50 if ($value > 50); }
+	    $nconf{maxrcpts} = 50 if ($value > 50);
+	  }
 	  when ('delay') { $nconf{delay} = $value; }
 	  when ('maxsize') { $nconf{maxsize} = $value; }
 	  when ('language') { $nconf{language} = lc $value; }
@@ -1776,7 +1779,8 @@ sub read_config ($$) {
 	    # Make lowercase if value isn't URL
 	    $nconf{listinfo} = lc($value) if ($value =~ /^(yes|no)$/i);
 	    # In global config only 'yes' or 'no' allowed
-	    $nconf{listinfo} = 'no' if ($scope eq 'global' && $nconf{listinfo} ne 'yes'); }
+	    $nconf{listinfo} = 'no' if ($scope eq 'global' && $nconf{listinfo} ne 'yes');
+	  }
 	  when ('strip rrq') { $nconf{strip_rrq} = lc($value); }
 	  when ('modify message-id') { $nconf{modify_msgid} = lc($value); }
 	  when ('remove resent') { $nconf{remove_resent} = lc($value); }
