@@ -1879,7 +1879,12 @@ sub archive ($$$) {
  my $msgnum;
  if (open(NUM, $path."SEQUENCE")) {
    read NUM, $msgnum, 16;
-   $msgnum = int($msgnum);
+   if ($msgnum =~ /^([0-9]+)$/) {
+     $msgnum = int($1);
+   }
+   else {
+     die "Error reading sequence number from ${path}SEQUENCE";
+   }
    close NUM;
   }
  else { $msgnum = 0 }
