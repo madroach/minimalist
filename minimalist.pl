@@ -329,6 +329,7 @@ if (defined $ARGV[0] && $ARGV[0] eq '-') {
     print "\nCopy to sender: $lconf{copy_sender}\n".
 	"Reply-To list: $lconf{reply_to_list}\n".
 	"List GECOS: ".($lconf{list_gecos} ? $lconf{list_gecos} : "empty")."\n".
+	"Subject tag: ".($lconf{subject_tag} ? $lconf{subject_tag} : "empty")."\n".
 	"Substitute From: ".($lconf{outgoing_from} ? $lconf{outgoing_from} : "none")."\n".
 	"Admin: $lconf{admin}\n".
 	"Errors from MTA: ".($lconf{errors_to} eq 'drop' ? "drop" :
@@ -558,15 +559,16 @@ _EOF_
     exit 0 if ($header =~ s/(^|\n)list-id:\s+(.*)\n/$1/i && $2 =~ /$list.$conf{domain}/i);
 
     if ($conf{modify_subject} ne 'no') {
+      my $tag = $conf{subject_tag} // $list;
       $orig_subj = $subject;
       if ($conf{modify_subject} eq 'more') {	# Remove leading "Re: "
-	$subject =~ s/^.*:\s+(\[$list\])/$1/ig }
+	$subject =~ s/^.*:\s+(\[\Q$tag\E\])/$1/ig }
       else {				# change anything before [...] to Re:
-	$subject =~ s/^(.*:\s+)+(\[$list\])/Re: $2/ig; }
+	$subject =~ s/^(.*:\s+)+(\[\Q$tag\E\])/Re: $2/ig; }
 
-      # Modify subject if it don't modified before
-      if ($subject !~ /^(.*:\s+)?\[$list\] /i) {
-	$subject = "[$list] ".$subject; }
+      # Modify subject if not already done
+      if ($subject !~ /^(.*:\s+)?\[\Q$tag\E\] /i) {
+	$subject = "[$tag] ".$subject; }
     }
 
     open LIST, "$conf{listdir}/$list/list" and do {
@@ -1724,6 +1726,7 @@ sub read_config ($$) {
 	      }
 	    }
 	    when ('list gecos') { $nconf{list_gecos} = $value; }
+	    when ('subject tag') { $nconf{subject_tag} = $value; }
 	    when ('to recipient') { $nconf{to_recipient} = lc($value); }
 	  }
 	  # Both: local and global
