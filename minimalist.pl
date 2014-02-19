@@ -1420,10 +1420,12 @@ sub subscribe ($$;$) {
   my $deny = 0;
   my $owner = "$list-owner\@$conf{domain}";
 
-  # Clear any spoofed settings
-  $email =~ s/>.*$//;
-
-  $email = $from unless(defined $email);
+  if (defined($email)) {
+    # Clear any spoofed settings
+    $email =~ s/>.*$//;
+  } else {
+    $email = $from;
+  }
 
   if (open LIST, "$conf{listdir}/$list/list") {
     my $users = '';
