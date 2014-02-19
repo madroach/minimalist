@@ -1085,11 +1085,12 @@ else {
 	  # Quote specials (+)
 	  $email =~ s/\+/\\\+/g;	# qtemail
 
-	  opendir DIR, ".";
+	  opendir DIR, $conf{listdir};
 	  while (my $dir = readdir DIR) {
-	    if (-d $dir && $dir !~ /^\./) {	# Ignore entries starting with '.'
+            # skip  1. non-directories      2. "."/".."/"hidden" entries
+	    if (-d "$conf{listdir}/$dir" && $dir !~ /^\./) {
 	      foreach my $f ("", "-writers") {
-		open LIST, "$dir/list".$f and do {
+		open LIST, "$conf{listdir}/$dir/list".$f and do {
 		  while (<LIST>) {
 		    chomp($_);
 		    if ($_ =~ /$email(>.*)?$/i) {
