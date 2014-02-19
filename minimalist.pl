@@ -1452,10 +1452,10 @@ sub subscribe ($$;$) {
 
   if (! $deny) {
     &lockf(*LIST, 'lock'); print LIST "$email\n"; &lockf(*LIST);
-    $msg .= mt('you have subscribed to [_1] successfully.', uc $list).
-    "\n\n".
-    mt('Description of the list:'). "\n".
-    read_info($list, 'info');
+    $msg .= mt('you have subscribed to [_1] successfully.', uc $list);
+    if (my $descr = read_info($list, 'info')) {
+      $msg .= "\n\n". mt('Description of the list:'). "\n". $descr;
+    }
   }
   else {
     $msg .=
