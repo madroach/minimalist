@@ -1441,7 +1441,11 @@ sub subscribe ($$;$) {
       $cause = mt('there are already the maximum number of [*,_1,subscriber] subscribed to [_2].',
       $conf{maxusers}, uc $list);
     }
-    open LIST, ">>$conf{listdir}/$list/list" unless ($deny);
+    if (! $deny && ! open LIST, ">>$conf{listdir}/$list/list") {
+      $deny = 3;
+      $cause = mt('automatic subscriptions to the [_1] list are restricted',
+                  uc $list);
+    }
   }
 
   $msg .= mt('Dear [_1],', $email). "\n\n";
