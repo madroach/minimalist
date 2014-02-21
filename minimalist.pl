@@ -577,16 +577,15 @@ _EOF_
 	  $ent = lc($1);
 
 	  # Get and remove per-user settings from e-mail
-	  $ent =~ s/(>.*)$//; my $userSet = $1;
+	  my ($userSet)	= $ent =~ s/(>.*)$//;
 
 	  # Check for '+' (write access) or '-' (read only access)
 	  if (defined $userSet && $userSet =~ /-/) { push (@readonly, $ent); }
 	  elsif (defined $userSet && $userSet =~ /\+/) { push (@writeany, $ent); }
 
 	  # If user's maxsize
-	  my $usrMaxSize;
-	  if (defined $userSet && $userSet !~ /#ms([0-9]+)/) { undef $usrMaxSize }
-	  else { $usrMaxSize = $1 }
+	  my $usrMaxSize = 0;
+	  if (defined $userSet && $userSet =~ /#ms([0-9]+)/) { $usrMaxSize = $1; }
 
 	  # If suspended (!) or maxsize exceeded, do not put in @members
 	  if (defined $userSet && $userSet =~ /!/ || ($usrMaxSize && length($body) > $usrMaxSize)) {
@@ -607,7 +606,7 @@ _EOF_
 	    chomp($ent); $ent = lc($ent);
 
 	    # Get and remove per-user settings from e-mail
-	    $ent =~ s/(>.*)$//; my $userSet = $1;
+	    my ($userSet) = $ent =~ s/(>.*)$//;
 
 	    # Check for '+' (write access) or '-' (read only access)
 	    if (defined $userSet && $userSet =~ /-/) { push (@readonly, $ent); }
