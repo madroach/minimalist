@@ -28,6 +28,7 @@
 # THE POSSIBILITY OF SUCH DAMAGE.
 
 use v5.10;
+no if $] >= 5.018, warnings => "experimental::smartmatch";
 use strict;
 use integer;
 use Fcntl ':flock';	# LOCK_* constants
