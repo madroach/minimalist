@@ -493,6 +493,7 @@ if (defined $ARGV[0] && $ARGV[0] eq '-') {
     my @recipients;
     my @rw;
     my @writeany;
+    my @dontcopyme;
 
     # normalize to exact directory name.
     if (exists $lists{lc $list}) {
@@ -579,11 +580,15 @@ _EOF_
 	  $ent = lc($1);
 
 	  # Get and remove per-user settings from e-mail
-	  my ($userSet)	= $ent =~ s/(>.*)$//;
+	  my $userSet;
+	  ($ent, $userSet) = split (/>/, $ent);
 
 	  # Check for '+' (write access) or '-' (read only access)
 	  if (defined $userSet && $userSet =~ /-/) { push (@readonly, $ent); }
 	  elsif (defined $userSet && $userSet =~ /\+/) { push (@writeany, $ent); }
+
+	  # Check for 'd' (dont copy me)
+	  if (defined $userSet && $userSet =~ /d/) { push (@dontcopyme, $ent); }
 
 	  # If user's maxsize
 	  my $usrMaxSize = 0;
@@ -608,11 +613,15 @@ _EOF_
 	    chomp($ent); $ent = lc($ent);
 
 	    # Get and remove per-user settings from e-mail
-	    my ($userSet) = $ent =~ s/(>.*)$//;
+	    my $userSet;
+	    ($ent, $userSet) = split (/>/, $ent);
 
 	    # Check for '+' (write access) or '-' (read only access)
 	    if (defined $userSet && $userSet =~ /-/) { push (@readonly, $ent); }
 	    elsif (defined $userSet && $userSet =~ /\+/) { push (@writeany, $ent); }
+
+	    # Check for 'd' (dont copy me)
+	    if (defined $userSet && $userSet =~ /d/) { push (@dontcopyme, $ent); }
 
 	    push (@rw, $ent); }
 	}
@@ -943,10 +952,22 @@ _EOF_
     my @t;
     @members = sort @t = Invert ('@', '!', @members);
     @rcpts =   sort @t = Invert ('@', '!', @rcpts);
+    @dontcopyme = sort @t = Invert ('@', '!', @dontcopyme);
 
     for (my $r = my $m = 0; $m < @members; ) {
       if ($r >= @rcpts || $members[$m] lt $rcpts[$r]) {
-	push (@recipients, $members[$m++]); }
+	my $qmember = quotemeta($members[$m]);
+	if (!grep(/^$qmember$/i, @dontcopyme)) {
+	  push (@recipients, $members[$m++]); }
+	else {
+	  my ($dom, $us) = split ('!', $members[$m]);
+	  if ($us.'@'.$dom ne $from) {
+	    push (@recipients, $members[$m++]); }
+	  else {
+	    $m++;
+	  }
+	}
+      }
       elsif ($members[$m] eq $rcpts[$r]) { $r++; $m++; }
       elsif ($members[$m] gt $rcpts[$r]) { $r++ };
     }
@@ -1566,6 +1587,10 @@ sub txtUserSet {
     if ($userSet =~ /!/) {
       $usrmsg .= ($i++ ? '; ' : ''). mt('subscription suspended');
     };
+    # Don't Copy Me
+    if ($userSet =~ /d/) {
+      $usrmsg .= ($i++ ? '; ' : ''). mt('no post to self');
+    };
     # Maxsize
     if ($userSet =~ /#ms([0-9]+)/) {
       $usrmsg .= ($i++ ? ';' : '').
@@ -1627,6 +1652,10 @@ sub chgSettings ($$$$;@) {
 	    $newSet = chgUserSet($currentSet, '!+', '!'); }
 	  when ('resume') {
 	    $newSet = chgUserSet($currentSet, '!+'); }
+	  when ('not-self') {
+	    $newSet = chgUserSet($currentSet, 'd+', 'd'); }
+	  when ('add-self') {
+	    $newSet = chgUserSet($currentSet, 'd+'); }
 	  when ('maxsize') {
 	    if ($params[0]+0 == 0) {
 	      $newSet = chgUserSet($currentSet, '(#ms[0-9]+)+'); }
