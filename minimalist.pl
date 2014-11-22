@@ -207,6 +207,7 @@ $maketext = Translation::en->new() || die "Language?";
 if ($> == 0 && $< != 0) {
   my $uid;
   my $gid = getgrnam('nogroup');
+  defined $gid or $gid = getgrnam('nobody');
   defined $gid or die "Could not get gid of nogroup.";
   if (defined $conf{user}) {
     $uid = getpwnam($conf{user});
