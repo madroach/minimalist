@@ -807,15 +807,14 @@ _EOF_
     # append footer to existing MIME structure
     #
     if (my $footer = read_info($list, 'footer')) {
-      my $encoding = '7bit';
-
       $header =~ /(^|\n)Content-Type:\s+(.*\n(\s+.*\n)*)/i;
       my $ctyped = $2;
       # Check if there is Content-Type and it isn't multipart/*
       if (!$ctyped || $ctyped !~ /^multipart\/(mixed|related)/i) {
 	$ctyped =~ /charset="?(.*?)"?[;\s]/i;
 	my $msgcharset = lc($1);
-	$encoding = lc($2)
+	$header =~ /(^|\n)Content-Transfer-Encoding:\s+(.*)\n/i;
+	my $encoding = lc($1)
 	if ($header =~ /(^|\n)Content-Transfer-Encoding:[ \t]+(.*\n([ \t]+.*\n)*)/i);
 
 	# If message is 7/8bit text/plain with same charset without preset headers in
