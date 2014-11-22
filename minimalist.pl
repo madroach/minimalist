@@ -243,7 +243,7 @@ if ($> == 0 && $< != 0) {
 ####################################################################
 
 opendir(LISTDIR, $conf{listdir}) || die "Cannot open $conf{listdir}!";
-while (readdir LISTDIR) {
+while ($_ = readdir LISTDIR) {
   warn "$_ list is found twice - maybe in differing case?" if (exists $lists{lc $_});
   $lists{lc $1} = $1 if(/^([^\.].*)$/ && -d "$conf{listdir}/$_");
 }
