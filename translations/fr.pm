@@ -1,6 +1,6 @@
 # French translation for the minimalist mailing list manager
 #
-# Copyright (c) 2012, Floréal Toumikian <floreal@nimukaito.net>
+# Copyright (c) 2017, Floréal Toumikian <floreal@nimukaito.net>
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose with or without fee is hereby granted, provided that the above
@@ -43,7 +43,7 @@ our %Lexicon = (
   "Sincèrement, Minimalist",
 
   'You([_1]) are not subscribed to this list([_2]).' =>
-  "Vous([_1]) nêtes pas inscrit(e) à cette liste de diffusion([_2]).",
+  "Vous([_1]) n'êtes pas inscrit-e à cette liste de diffusion([_2]).",
 
   "Send a message to [_1] with a subject of 'help' (no quotes) for information about howto subscribe.",
   "Envoyez un message à [_1] avec pour sujet « help » (sans guillement) pour obtenir de l'aide pour vous inscrire.",
@@ -52,13 +52,13 @@ our %Lexicon = (
   'Votre message est:',
 
   'You([_1]) are not allowed to write to this list.' =>
-  "Vous([_1]) n'êtes pas auterisé à écrire à cette list.",
+  "Vous([_1]) n'êtes pas auterisé·e à écrire à cette list.",
 
   'Message size is larger than maximum allowed ([_1] bytes).' =>
-  'La taille du message excède le maximum autorisé [_1] octets).',
+  'La taille du message excède le maximum autorisé ([_1] octets).',
 
   'Either send a smaller message or split your message into multiple smaller ones.' =>
-  'Envoyez en message plus court ou séparez le en plusieurs messages plus petits.',
+  'Envoyez en message plus court ou bien séparez le en plusieurs messages plus petits.',
 
   'Your message header follows:' =>
   'Les entêtes de votre message sont:',
@@ -81,12 +81,11 @@ our %Lexicon = (
   'Current subscriptions of [_1]:' =>
   'Inscription en cours de [_1]:',
 
-
   'There is no list ([_1]) here.' =>
-  "Il n'y a pas de list [_1] ici.",
+  "Il n'y a pas de liste [_1] ici.",
 
   "Send a message to [_1] with a subject of 'info' (no quotes) for a list of available mailing lists." =>
-  "Envoyez un message à [_1] avec pour sujet « help » (sans guillemets) pour connaître les listes de diffusion disponibles..",
+  "Envoyez un message à [_1] avec pour sujet « help » (sans guillemets) pour connaître les listes de diffusion disponibles.",
 
   'Description of list [_1]:' =>
   'Desciption de la liste [_1]:',
@@ -95,7 +94,7 @@ our %Lexicon = (
   'Pas de description disponible.',
 
   '[*,_1,user is,users are,No user is] subscribed to [_2]:' =>
-  "[*,_1,utilisateur est,utilisateur sont,Pesonne n'est] inscrit à [_2]:",
+  "[*,_1,utilisateur-trice est inscrit·e,utilisateur·trice·s sont inscrit·e·s,Pesonne n'est inscrit·e] à [_2]:",
 
   'You are not allowed to get a listing of subscribed users.' =>
   "Vous n'avez pas l'autorisation d'obtenir la liste des utilisateurs inscrits",
@@ -110,37 +109,37 @@ our %Lexicon = (
   "Prière d'envoyer vos questions et commentaires à [_1].",
 
   "You aren't allowed to subscribe other people." =>
-  "Vous n'êtes pas autorisé à inscrire d'autres peresonnes.",
+  "Vous n'avez pas l'autorisation d'inscrire d'autres peresonnes.",
 
   'You are not allowed to change settings of other people.' =>
-  "Vous n'êtes pas autorisé à changer les paramètres d'autres personnes.",
+  "Vous n'avez pas l'autorisation de changer les paramètres d'autres personnes.",
 
   'you are already subscribed to [_1].' =>
-  'vous êtes déjà inscrit(e) à [_1].',
+  'vous êtes déjà inscrit·e à [_1].',
 
   'there are already the maximum number of [*,_1,subscriber] subscribed to [_2].' =>
-  "Le nombre maximum de [*,_1,utilisateur inscrit,utilisateurs inscrits] à la liste [_2] a été ateint",
+  "Le nombre maximum de [*,_1,utilisateur·trice inscrit·e,utilisateur·trice·s inscrit·e·s] à la liste [_2] a été ateint",
 
   'You have been subscribed to [_1]' =>
-  'Vous avez été inscrit à [_1]',
+  'Vous avez été inscrit·e à [_1]',
 
   'You have been unsubscribed from [_1]' =>
-  'Vous avez écé désincrit de [_1]',
+  'Vous avez écé désincrit·e de [_1]',
 
   'you have subscribed to [_1] successfully.' =>
-  'Vous êtes correctement inscrit à la liste [_1].',
+  'Vous êtes correctement inscrit·e à la liste [_1].',
 
   'Description of the list:' =>
   'Description de la liste:',
 
   'you have not been subscribed to [_1] due to the following reason:' =>
-  "Vous n'avez pas été inscrit à la listte [_1] pour les raisons suivantes:",
+  "Vous n'avez pas été inscrit·e à la listte [_1] pour les raisons suivantes:",
 
   'User [_1] has been unsubscribed sucessfully from [_2].' =>
-  "L'utilisateur [_1] a été correctement désinscrit de [_2].",
+  "L'utilisateur·trice [_1] a été correctement désinscrit·e de [_2].",
 
   'User [_1] is not a registered member of list [_2].' =>
-  "L'utilisateur [_1] n'est pas enregistré comme membre à la liste [_2].",
+  "L'utilisateur·trice [_1] n'est pas enregistré·e comme membre à la liste [_2].",
 
 
   'posts are allowed' => 'Messages autorisés',
@@ -151,7 +150,7 @@ our %Lexicon = (
   'there are no specific settings' => "Il n'y a pas de paramètre spécifique",
 
   'Settings for user [_1] on list [_2]:' =>
-  "Paramètre pour l'utilisateur [_1] sur la liste [_2]:",
+  "Paramètre pour l'utilisateur-trice [_1] sur la liste [_2]:",
 
   'Please note that settings for [_1] on [_2] did not change.' =>
   "Veillez noter que les paramètres pour [_1] de la liste [_2] n'ont pas été modifiés.",
