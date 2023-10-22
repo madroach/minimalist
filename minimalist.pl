@@ -1044,8 +1044,13 @@ else {
     my $msg = '';
     %conf = %global_conf;
 
+    my $verb = shift @cmd;
+
+    # the given() construct will somehow destroy verb
+    my $saved_verb = $verb;
+
     #TODO: reset config to global config after each iteration.
-    given (shift @cmd) {
+    given ($verb) {
       when ([qw/stop exit end thanks --/]) { last }
 
       when ('help') { $msg .= "\n".mt('_USAGE') }
@@ -1187,7 +1192,9 @@ else {
 	break;
       }
 
-      when ('who') {
+      # "when" clauses break at this point, switch to if-then
+
+      if ($saved_verb eq 'who') {
 	if (verify($from, $password)) {
 	  my @whoers;
 	  logCommand($from, $line);
@@ -1218,10 +1225,10 @@ else {
 	}
       }
 
-      when ('subscribe') {
+      elsif ($saved_verb eq 'subscribe') {
 	my $email = shift @cmd;
 	$email = $1 if (defined $email && $email =~/^($addr)/);
-	
+
 	if (verify($from, $password)) {
 	  $msg .= subscribe($list, $from, $email);
 	  logCommand($from, $line);
@@ -1248,7 +1255,7 @@ else {
 	}
       }
 
-      when ('unsubscribe') {
+      elsif ($saved_verb eq 'unsubscribe') {
 	my $email = shift @cmd;
 	$email = $1 if (defined $email && $email =~/^($addr)/);
 	
@@ -1279,33 +1286,7 @@ else {
 	}
       }
 
-      # obsoleted by mode ?
-      if (0) {
-      when ('suspend' || 'resume') {
-	if (verify($from, $password) || $conf{security} ne 'paranoid') {
-	  $msg = chgSettings($msg, $_, $list, $from, $from);
-	  logCommand($from, $line);
-	}
-	else { genAuth($list, $from, $line, $_); }
-      }
-
-      # obsoleted by mode ?
-      when ('maxsize') {
-	if ((shift @cmd) =~ /^\d+$/) {
-	  if (verify($from, $password) || $conf{security} ne 'paranoid') {
-	    $msg = chgSettings($_, $list, $from, $from, $1);
-	    logCommand($from, $line);
-	  }
-	  else { genAuth($list, $from, $line, $_, $1); }
-	}
-	else {
-	  $msg = mt('ERROR:'). ' '. mt('Bad syntax or unknown instruction.');
-	  break;
-	}
-      }
-      }
-
-      when ('mode') {
+      elsif ($saved_verb eq 'mode') {
 	my $mode = shift @cmd;
 	unless (defined $mode) {
 	  $msg = mt('ERROR:'). ' '. mt('Bad syntax or unknown instruction.');
@@ -1357,7 +1338,7 @@ else {
 	}
       }
 
-      default {
+      else {
 	$msg = mt('ERROR:'). ' '. mt('Bad syntax or unknown instruction.');
 	break;
       }
