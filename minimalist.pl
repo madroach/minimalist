@@ -35,6 +35,7 @@ use Fcntl ':flock';	# LOCK_* constants
 use Carp;
 use Net::Config qw(%NetConfig);
 use Net::SMTP;
+use OpenBSD::Unveil;
 require File::Spec;
 require Digest::MD5;
 require MIME::QuotedPrint;
@@ -197,45 +198,16 @@ sub mt (@) { $maketext->maketext(@_) }
 $maketext = Translation::en->new() || die "Language?";
 
 
-################################################################
-# >>>>>>>>>>>>>>> CHROOT AND DROP PRIVILEGES <<<<<<<<<<<<<<<<< #
-################################################################
+#####################################################
+# >>>>>>>>>>>>>>> DROP PRIVILEGES <<<<<<<<<<<<<<<<< #
+#####################################################
 
 -d $conf{directory} or die "$conf{directory} is not a directory.";
 
-# $< and $( are real [ug]id, $> and $) are effective [ug]id
-if ($> == 0 && $< != 0) {
-  my $uid;
-  my $gid = getgrnam('nogroup');
-  defined $gid or $gid = getgrnam('nobody');
-  defined $gid or die "Could not get gid of nogroup.";
-  if (defined $conf{user}) {
-    $uid = getpwnam($conf{user});
-    defined $uid or die "Could not get uid of $conf{user}.";
-  }
-  else { $uid = $< }
+unveil( $conf{directory}, "crw" ) or die "Unable to unveil: $!";
+unveil() || die "Unable to lock unveil: $!";
+chdir "$conf{directory}" or die "Cannot chdir to ($conf{directory}).";
 
-  # drop group privileges
-  $) = "$gid $gid";
-  die "Error while dropping group privileges: $!" unless($) eq "$gid $gid");
-  POSIX::setgid($gid) or die "setgid failed: $!";;
-
-  # chroot
-  chroot $conf{directory} or die "Could not chroot to $conf{directory}: $!";
-  chdir '/' or die "Cannot chdir to / in chroot ($conf{directory}).";
-  $conf{directory} = '/';
-
-  # drop user privileges
-  POSIX::setuid($uid) or die "setuid failed: $!";
-
-  # This may be too paranoid, but check
-  # that privileges are really dropped permanently
-  POSIX::setuid(0);
-  POSIX::setgid(0);
-  my $groups = qr/^$gid( $gid)?$/;
-  if ($< == 0 || $> == 0 || $( !~ $groups || $) !~ $groups) {
-    die "Could not drop privileges permanently." }
-}
 @INC = ('.');
 
 ####################################################################
